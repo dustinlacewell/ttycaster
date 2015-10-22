@@ -1,0 +1,38 @@
+#!/bin/bash
+
+# validate at least 2 args are supplied
+if [[ ( -z $1 ) || ( -z $2 ) ]]; then
+    echo "Usage: ./ttycaster user@hostname:port /what/to/cast"
+    exit
+fi
+
+connection="$1" # where to ssh
+command="${@:2}" # what to stream
+
+# parse connection details
+hostname="$(echo $connection | cut -d ':' -f 1)"
+port="$(echo $connection | cut -s -d ':' -f 2)"
+port="${port:-22}" # default ssh port
+
+# streamer message
+advert="${advert:-$user}"
+
+# local terminal dimensions
+rows=$(stty size | cut -d ' ' -f 1)
+cols=$(stty size | cut -d ' ' -f 2)
+echo "Term size: $cols x $rows"
+
+# create local named-pipe
+pipe="/tmp/ttycast"
+rm -f $pipe
+mkfifo $pipe
+
+# execute dlacewell/ttycast container on host
+echo "Logging into remote host: $hostname:$port"
+sleep 3 && \
+    ttyplay -n /tmp/ttycast | \
+        ssh -p $port $hostname $cols $rows "$advert" > /dev/null &
+
+# execute local command
+cd $(dirname $1) # path of command
+ttyrec -e $command /tmp/ttycast

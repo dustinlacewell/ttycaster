@@ -1,0 +1,11 @@
+#!/bin/bash
+
+IFS=' ' eval 'args=($2)'
+cols="${args[0]:-80}"
+rows="${args[1]:-24}"
+advert="${args[@]:2}"
+image="dlacewell/ttycaster"
+
+docker run --rm \
+    -i -p 9000 -e PORT=9000 -e ADVERT="$advert" \
+    $image ttycast -c $cols -r $rows
