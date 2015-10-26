@@ -31,7 +31,7 @@ mkfifo $pipe
 echo "Logging into remote host: $hostname:$port"
 sleep 3 && \
     ttyplay -n /tmp/ttycast | \
-        ssh -o KexAlgorithms=+diffie-hellman-group1-sha1 \
+        ssh -o KexAlgorithms=diffie-hellman-group1-sha1 \
             -o StrictHostKeyChecking=no \
             -o GlobalKnownHostsFile=/dev/null \
             -o UserKnownHostsFile=/dev/null \

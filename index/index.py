@@ -1,5 +1,7 @@
 import os
 
+from gevent import monkey; monkey.patch_all()
+
 from docker import Client
 
 from bottle import route, run, template
@@ -74,4 +76,4 @@ def index():
     streams = get_streams()
     return template(T, streams=list(streams))
 
-run(host='0.0.0.0', port=int(port))
+run(host='0.0.0.0', port=int(port), server='gevent')
