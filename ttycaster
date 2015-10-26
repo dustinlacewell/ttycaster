@@ -31,7 +31,11 @@ mkfifo $pipe
 echo "Logging into remote host: $hostname:$port"
 sleep 3 && \
     ttyplay -n /tmp/ttycast | \
-        ssh -p $port $hostname $cols $rows "$advert" > /dev/null &
+        ssh -o KexAlgorithms=+diffie-hellman-group1-sha1 \
+            -o StrictHostKeyChecking=no \
+            -o GlobalKnownHostsFile=/dev/null \
+            -o UserKnownHostsFile=/dev/null \
+            -p $port $hostname $cols $rows "$advert" > /dev/null &
 
 # execute local command
 cd $(dirname $1) # path of command
