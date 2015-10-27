@@ -22,8 +22,8 @@ T = """
     <ul>
       % for stream in streams:
       <li>
-        <a href="{{stream.url}}">{{stream.port}}</a>
-        <span>{{stream.advert}}</span>
+        <a href="{{stream.url}}">{{stream.name}}</a>
+        <span class="advert">{{stream.advert}}</span>
       </li>
       % end
     </ul>
@@ -33,7 +33,8 @@ T = """
 """
 
 class Stream(object):
-    def __init__(self, port, advert):
+    def __init__(self, name, port, advert):
+        self.name = name
         self.port = port
         self.advert = advert
         self.url = "http://{}:{}/".format(hostname, port)
@@ -67,9 +68,10 @@ def get_streams():
     containers = get_containers()
     for c in containers:
         info = client.inspect_container(c["Id"])
+        name = get_env(info, "NAME")
         port = get_port(info, 9000)
-        advert = get_env(info, "ADVERT", "BLANK")
-        yield Stream(port, advert)
+        advert = get_env(info, "ADVERT")
+        yield Stream(name, port, advert)
 
 @route('/')
 def index():

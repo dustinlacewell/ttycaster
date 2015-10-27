@@ -10,6 +10,9 @@ connection="$1" # where to ssh
 command="${@:2}" # what to stream
 
 # parse connection details
+user="$(echo $connection | cut -s -d '@' -f 1)"
+user="${user:-$(echo $USER)}"
+hostname="$(echo $connection | cut -d '@' -f 2)"
 hostname="$(echo $connection | cut -d ':' -f 1)"
 port="$(echo $connection | cut -s -d ':' -f 2)"
 port="${port:-22}" # default ssh port
@@ -28,14 +31,14 @@ rm -f $pipe
 mkfifo $pipe
 
 # execute dlacewell/ttycast container on host
-echo "Logging into remote host: $hostname:$port"
+echo "Logging to $hostname:$port as $user"
 sleep 3 && \
     ttyplay -n /tmp/ttycast | \
         ssh -o KexAlgorithms=diffie-hellman-group1-sha1 \
             -o StrictHostKeyChecking=no \
             -o GlobalKnownHostsFile=/dev/null \
             -o UserKnownHostsFile=/dev/null \
-            -p $port $hostname $cols $rows "$advert" > /dev/null &
+            -p $port $hostname $cols $rows $user "$advert" > /dev/null &
 
 # execute local command
 cd $(dirname $1) # path of command
