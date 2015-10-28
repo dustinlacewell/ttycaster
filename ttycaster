@@ -17,9 +17,6 @@ hostname="$(echo $connection | cut -d ':' -f 1)"
 port="$(echo $connection | cut -s -d ':' -f 2)"
 port="${port:-22}" # default ssh port
 
-# streamer message
-advert="${advert:-$user}"
-
 # local terminal dimensions
 rows=$(stty size | cut -d ' ' -f 1)
 cols=$(stty size | cut -d ' ' -f 2)
@@ -34,11 +31,12 @@ mkfifo $pipe
 echo "Logging to $hostname:$port as $user"
 sleep 3 && \
     ttyplay -n /tmp/ttycast | \
-        ssh -o KexAlgorithms=diffie-hellman-group1-sha1 \
+        ssh \
+            -o KexAlgorithms=diffie-hellman-group1-sha1 \
             -o StrictHostKeyChecking=no \
             -o GlobalKnownHostsFile=/dev/null \
             -o UserKnownHostsFile=/dev/null \
-            -p $port $hostname $cols $rows $user "$advert" > /dev/null &
+            -p $port $hostname $rows $cols $msg &> /dev/null &
 
 # execute local command
 cd $(dirname $1) # path of command

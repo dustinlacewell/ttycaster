@@ -1,0 +1,25 @@
+#!/bin/bash
+
+image="dlacewell/funneld"
+name="funneld"
+port="2200"
+socket="/var/run/docker.sock"
+shell="/usr/bin/ttycaster-sh"
+
+# update funneld image
+docker pull $image
+
+# remove existing container
+docker rm -f $name
+
+# start funneld
+docker run \
+       -d -t \
+       --name=$name \
+       --privileged \
+       -p $port:22 \
+       -e HOSTNAME=$(hostname) \
+       -v $shell:/usr/bin/funnel-sh \
+       -v $socket:$socket \
+       $image
+

@@ -7,7 +7,7 @@ from docker import Client
 from bottle import route, run, template
 
 hostname = os.environ["HOSTNAME"]
-port = os.environ.get("PORT", "9000")
+port = os.environ.get("VIRTUAL_PORT", "80")
 
 client = Client(base_url="unix:///var/run/docker.sock")
 
@@ -33,11 +33,10 @@ T = """
 """
 
 class Stream(object):
-    def __init__(self, name, port, advert):
+    def __init__(self, name, advert):
         self.name = name
-        self.port = port
         self.advert = advert
-        self.url = "http://{}:{}/".format(hostname, port)
+        self.url = "http://{}.{}/".format(name, hostname)
 
 def get_containers():
     containers = client.containers(filters=dict(status='running'))
@@ -54,24 +53,13 @@ def get_env(info, name, default=None):
             return val
     return default
 
-def get_port(info, port):
-    settings = info.get('NetworkSettings')
-    if not settings: return 0
-    ports = settings.get('Ports')
-    if not ports: return 0
-    for key, value in ports.items():
-        number, proto = key.split('/')
-        if str(number) == str(port):
-            return value[0]["HostPort"]
-
 def get_streams():
     containers = get_containers()
     for c in containers:
         info = client.inspect_container(c["Id"])
-        name = get_env(info, "NAME")
-        port = get_port(info, 9000)
+        name = info["Name"][1:]
         advert = get_env(info, "ADVERT")
-        yield Stream(name, port, advert)
+        yield Stream(name, advert)
 
 @route('/')
 def index():

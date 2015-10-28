@@ -1,0 +1,11 @@
+#!/bin/bash
+
+image="dlacewell/ttycaster"
+
+docker rm -f $NAME &> /dev/null
+
+docker run --name="$NAME" \
+       -i -p 80  -e PORT=80 \
+       -e ADVERT="$1" \
+       -e VIRTUAL_HOST="$NAME.$HOSTNAME" \
+       $image ttycast -r "$ROWS" -c "$COLS" &> /dev/null

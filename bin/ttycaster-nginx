@@ -1,0 +1,12 @@
+#!/bin/bash
+
+image=jwilder/nginx-proxy
+name=nginx
+port=80
+socket=/var/run/docker.sock
+
+docker pull $image
+
+docker rm -f $name
+
+docker run --name $name -d -p $port:$port -v $socket:/tmp/docker.sock:ro $image

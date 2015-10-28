@@ -1,0 +1,25 @@
+#!/bin/bash
+
+namespace="${namespace:-dlacewell}"
+image="$namespace/ttycaster-index"
+name=index
+socket=/var/run/docker.sock
+subdomain="${subdomain:-index}"
+domain="$subdomain.$HOSTNAME"
+
+# update index image
+docker pull $image
+
+# remove existing container
+docker rm -f $name
+
+# run ttycaster index
+docker run \
+       -d -t \
+       --name $name \
+       -p 80 \
+       --restart=always \
+       -e VIRTUAL_HOST=$domain \
+       -e HOSTNAME=$HOSTNAME \
+       -v $socket:/var/run/docker.sock:ro \
+       $image
