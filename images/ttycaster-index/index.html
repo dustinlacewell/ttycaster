@@ -1,0 +1,20 @@
+<html>
+  <body>
+    % if not streams:
+    <h1>No streams are active.</h1>
+    % else:
+    <h1>Current Streams:</h1>
+    <ul>
+      % for stream in streams:
+      <li>
+        <a href="{{stream.url}}">{{stream.name}}</a>
+        <span class="advert">{{stream.advert}}</span>
+      </li>
+      % end
+    </ul>
+    % end
+    <p>
+      <a href='https://gist.github.com/dustinlacewell/4c197c5251b69022084f'>Stream your own game too!</a>
+    </p>
+  </body>
+</html>
