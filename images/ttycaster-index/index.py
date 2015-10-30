@@ -4,33 +4,15 @@ from gevent import monkey; monkey.patch_all()
 
 from docker import Client
 
-from bottle import route, run, template
+from bottle import route, run, template, static_file
 
 hostname = os.environ["HOSTNAME"]
 port = os.environ.get("VIRTUAL_PORT", "80")
 
 client = Client(base_url="unix:///var/run/docker.sock")
 
-T = """
-
-<html>
-  <body>
-    % if not streams:
-    <h1>No streams are active.</h1>
-    % else:
-    <h1>Current Streams:</h1>
-    <ul>
-      % for stream in streams:
-      <li>
-        <a href="{{stream.url}}">{{stream.name}}</a>
-        <span class="advert">{{stream.advert}}</span>
-      </li>
-      % end
-    </ul>
-    % end
-  </body>
-</html>
-"""
+with open('index.html') as fh:
+    T = fh.read()
 
 class Stream(object):
     def __init__(self, name, advert):
@@ -65,5 +47,9 @@ def get_streams():
 def index():
     streams = get_streams()
     return template(T, streams=list(streams))
+
+@route('/index.css')
+def css():
+    return static_file('index.css')
 
 run(host='0.0.0.0', port=int(port), server='gevent')
