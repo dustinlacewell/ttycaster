@@ -49,7 +49,7 @@ def index():
     return template(T, streams=list(streams))
 
 @route('/static/<filename:path>')
-def assets(filename):
-    return static_file(filename, root='/assets')
+def static(filename):
+    return static_file(filename, root='/static')
 
 run(host='0.0.0.0', port=int(port), server='gevent')
