@@ -11,7 +11,7 @@ port = os.environ.get("VIRTUAL_PORT", "80")
 
 client = Client(base_url="unix:///var/run/docker.sock")
 
-with open('index.html') as fh:
+with open('/static/index.html') as fh:
     T = fh.read()
 
 class Stream(object):
@@ -48,8 +48,8 @@ def index():
     streams = get_streams()
     return template(T, streams=list(streams))
 
-@route('/index.css')
-def css():
-    return static_file('index.css')
+@route('/static/<filename:path>')
+def assets(filename):
+    return static_file(filename, root='/assets')
 
 run(host='0.0.0.0', port=int(port), server='gevent')
